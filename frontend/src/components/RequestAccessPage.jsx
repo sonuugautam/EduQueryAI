@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { GraduationCap, Mail, User, MessageSquare, ArrowLeft, Send } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +18,7 @@ const RequestAccessPage = () => {
     setIsSubmitting(true);
     
     try {
-      const response = await fetch('http://localhost:8001/api/auth/request-access', {
+      const response = await fetch('http://127.0.0.1:8000/api/auth/request-access', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -34,6 +34,7 @@ const RequestAccessPage = () => {
         throw new Error('Failed to submit request');
       }
     } catch (error) {
+      console.error('Request access error:', error);
       toast.error('Something went wrong. Please try again.', {
         style: { background: '#1e293b', color: '#fff', border: '1px solid #ffffff10' }
       });

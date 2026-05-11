@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   User, Mail, Bell, Shield, Cpu, Zap, 
-  Eye, Globe, LogOut, ChevronRight, Camera, Briefcase, Link as LinkIcon
+  Eye, Globe, LogOut, ChevronRight, Camera
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 

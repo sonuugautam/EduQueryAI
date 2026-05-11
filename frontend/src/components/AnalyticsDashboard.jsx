@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  LineChart, Line, AreaChart, Area, Cell, PieChart, Pie
+  AreaChart, Area, Cell
 } from 'recharts';
 import { 
   Activity, MessageSquare, Target, Hash, TrendingUp, Clock, 
-  Zap, PieChart as PieIcon, RefreshCw 
+  Zap, RefreshCw 
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getAnalytics, getRecentQueries } from '../utils/api';
@@ -38,23 +38,29 @@ const AnalyticsDashboard = ({ refreshTrigger, onTopicClick }) => {
   const [recentQueries, setRecentQueries] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
-    try {
-      const [analytics, recent] = await Promise.all([
-        getAnalytics(),
-        getRecentQueries()
-      ]);
-      setData(analytics);
-      setRecentQueries(recent);
-    } catch (error) {
-      console.error("Error fetching analytics:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    let active = true;
+
+    const fetchData = async () => {
+      try {
+        const [analytics, recent] = await Promise.all([
+          getAnalytics(),
+          getRecentQueries()
+        ]);
+        if (!active) return;
+        setData(analytics);
+        setRecentQueries(recent);
+      } catch (error) {
+        console.error("Error fetching analytics:", error);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
     fetchData();
+    return () => {
+      active = false;
+    };
   }, [refreshTrigger]);
 
   if (loading || !data) return (

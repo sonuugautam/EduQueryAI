@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { GraduationCap, Mail, Lock, ArrowRight, Shield, Globe } from 'lucide-react';
 import { useUser } from '../context/UserContext';
@@ -37,7 +37,7 @@ const LoginPage = () => {
     });
     
     try {
-      const response = await fetch(`http://localhost:8001/api/auth/${provider.toLowerCase()}`);
+      const response = await fetch(`http://127.0.0.1:8000/api/auth/${provider.toLowerCase()}`);
       const data = await response.json();
       
       if (data.error === "not_configured") {
@@ -65,6 +65,7 @@ const LoginPage = () => {
         window.location.href = data.url;
       }
     } catch (error) {
+      console.error('Social login error:', error);
       toast.error('Auth service unavailable', { id: toastId });
     }
   };

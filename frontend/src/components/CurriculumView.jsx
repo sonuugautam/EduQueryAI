@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { 
   BookOpen, Brain, Atom, Calculator, CheckCircle2, 
   ChevronRight, Clock, Star, Trophy, Loader2
@@ -17,7 +17,7 @@ const CurriculumView = ({ onContinuePath }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8001/api/curriculum')
+    fetch('http://127.0.0.1:8000/api/curriculum')
       .then(res => res.json())
       .then(json => {
         setData(json);

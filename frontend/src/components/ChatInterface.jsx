@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, Upload, User, Bot, Loader2, Mic, Paperclip } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Send, User, Bot, Loader2, Mic, Paperclip } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { sendMessage, uploadPDF } from '../utils/api';
 import { useUser } from '../context/UserContext';
@@ -14,6 +14,16 @@ const ChatInterface = ({ onQuerySuccess, initialQuery, onClearQuery }) => {
   const [uploading, setUploading] = useState(false);
   const scrollRef = useRef(null);
   const fileInputRef = useRef(null);
+  const inputRef = useRef(input);
+  const loadingRef = useRef(loading);
+
+  useEffect(() => {
+    inputRef.current = input;
+  }, [input]);
+
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -21,18 +31,11 @@ const ChatInterface = ({ onQuerySuccess, initialQuery, onClearQuery }) => {
     }
   }, [messages, loading]);
 
-  useEffect(() => {
-    if (initialQuery) {
-      handleSend(null, initialQuery);
-      if (onClearQuery) onClearQuery();
-    }
-  }, [initialQuery]);
-
-  const handleSend = async (e, forcedQuery = null) => {
+  const handleSend = useCallback(async (e, forcedQuery = null) => {
     if (e) e.preventDefault();
-    const queryToSubmit = forcedQuery || input;
-    
-    if (!queryToSubmit.trim() || loading) return;
+    const queryToSubmit = forcedQuery || inputRef.current;
+
+    if (!queryToSubmit.trim() || loadingRef.current) return;
 
     const userMsg = { id: Date.now(), text: queryToSubmit, sender: 'user' };
     setMessages(prev => [...prev, userMsg]);
@@ -52,11 +55,19 @@ const ChatInterface = ({ onQuerySuccess, initialQuery, onClearQuery }) => {
       setMessages(prev => [...prev, aiMsg]);
       if (onQuerySuccess) onQuerySuccess();
     } catch (error) {
-      setMessages(prev => [...prev, { id: Date.now() + 1, text: "Error connecting to service. Please try again.", sender: 'ai', isError: true }]);
+      console.error('Chat send error:', error);
+      setMessages(prev => [...prev, { id: Date.now() + 1, text: 'Error connecting to service. Please try again.', sender: 'ai', isError: true }]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [aiSettings, onQuerySuccess]);
+
+  useEffect(() => {
+    if (initialQuery) {
+      handleSend(null, initialQuery);
+      if (onClearQuery) onClearQuery();
+    }
+  }, [initialQuery, handleSend, onClearQuery]);
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -71,6 +82,7 @@ const ChatInterface = ({ onQuerySuccess, initialQuery, onClearQuery }) => {
         sender: 'ai' 
       }]);
     } catch (error) {
+      console.error('PDF upload error:', error);
       alert("Error uploading PDF");
     } finally {
       setUploading(false);

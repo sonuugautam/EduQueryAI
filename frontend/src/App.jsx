@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
   LayoutDashboard, MessageSquare, BookOpen, Settings, 
   Search, Bell, User, LogOut, GraduationCap, ChevronRight 
